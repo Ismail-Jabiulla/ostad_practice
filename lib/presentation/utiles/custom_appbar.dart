@@ -16,7 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       leading: GestureDetector(
         onTap: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ProfileScreen(toggleTheme: () {  },)));
+              MaterialPageRoute(builder: (context) => ProfileScreen()));
         },
         child: Padding(
           padding: const EdgeInsets.only(left: 16.0),
@@ -38,7 +38,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       title: GestureDetector(
         onTap: () {
           Navigator.push(context,
-              MaterialPageRoute(builder: (context) =>  ProfileScreen(toggleTheme: () { },)));
+              MaterialPageRoute(builder: (context) =>  ProfileScreen()));
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,

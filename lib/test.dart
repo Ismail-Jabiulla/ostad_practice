@@ -1,103 +1,62 @@
-import 'package:flutter/material.dart';
-
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => _MyAppState();
-}
-
-class _MyAppState extends State<MyApp> {
-  bool _isDarkMode = false;
-  int _selectedIndex = 0;
-
-  void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Theme Changer',
-      theme: _isDarkMode ? ThemeData.dark() : ThemeData.light(),
-      home: Scaffold(
-        appBar: AppBar(
-          title: Text('Theme Changer'),
-        ),
-        body: _getBody(_selectedIndex),
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          onTap: _onItemTapped,
-        ),
-      ),
-    );
-  }
-
-  Widget _getBody(int index) {
-    switch (index) {
-      case 0:
-        return GestureDetector(
-          onTap: _toggleTheme,
-          child: Container(
-            alignment: Alignment.center,
-            child: Text(
-              'Tap to change theme!',
-              style: TextStyle(fontSize: 20.0),
-            ),
-          ),
-        );
-      case 1:
-        return ProfileScreen(
-          toggleTheme: _toggleTheme,
-        );
-      default:
-        return Container();
-    }
-  }
-}
-
-class ProfileScreen extends StatelessWidget {
-  final VoidCallback toggleTheme;
-
-  ProfileScreen({required this.toggleTheme});
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            'Profile Page',
-            style: TextStyle(fontSize: 20.0),
-          ),
-          SizedBox(height: 20),
-          ElevatedButton(
-            onPressed: toggleTheme,
-            child: Text('Toggle Theme'),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// import 'package:flutter/cupertino.dart';
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:untitled/provider/language_provider.dart';
+// import 'localization/Language/language_bn.dart';
+// import 'localization/Language/language_en.dart';
+//
+// class Home extends StatefulWidget {
+//   const Home({super.key});
+//
+//   @override
+//   State<Home> createState() => _HomeState();
+// }
+//
+// class _HomeState extends State<Home> {
+//   @override
+//   Widget build(BuildContext context) {
+//
+//     var languageProvider = Provider.of<LanguageProvider>(context);
+//     var currentLanguage = languageProvider.currentLanguage;
+//     return Scaffold(
+//       backgroundColor: Colors.white,
+//       appBar: AppBar(backgroundColor: Colors.black,title: Text(currentLanguage.appName, style: TextStyle(color: Colors.blue),),),
+//       body: Column(
+//         mainAxisAlignment: MainAxisAlignment.center,
+//         crossAxisAlignment: CrossAxisAlignment.center,
+//         children: [
+//           Center(
+//             child: Container(color: Colors.white,
+//                 width: double.maxFinite,
+//                 child: Center(child: Text( currentLanguage.welcome, style: TextStyle(color: Colors.black,fontSize: 40, fontWeight: FontWeight.bold),))),
+//           ),
+//           SizedBox(height: 56,),
+//
+//           //English
+//           GestureDetector(onTap: () {
+//             languageProvider.changeLanguage(LanguageEn(), "LanguageEn");
+//           },
+//             child: Container(
+//               decoration: BoxDecoration(borderRadius: BorderRadius.circular(60), color: Colors.blue,),
+//               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+//               child: Text("English", style: TextStyle(color: Colors.white),),
+//             ),
+//           ),
+//
+//           SizedBox(height: 8,),
+//
+//           //Arabic
+//           GestureDetector(onTap: () {
+//             languageProvider.changeLanguage(LanguageBn(), "LanguageAr");
+//           },
+//             child: Container(
+//               decoration: BoxDecoration(borderRadius: BorderRadius.circular(60), color: Colors.blue,),
+//               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 24),
+//               child: Text("বাংলা", style: TextStyle(color: Colors.white),),
+//             ),
+//           ),
+//         ],
+//       ),
+//     );
+//   }
+// }

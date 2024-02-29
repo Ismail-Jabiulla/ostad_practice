@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../provider/language_provider.dart';
 import '../utiles/custom_appbar.dart';
 
 class ProcessScreen extends StatelessWidget {
@@ -11,7 +13,7 @@ class ProcessScreen extends StatelessWidget {
       appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
+          horizontal: 8.0,
         ),
         child: Stack(
           children: [
@@ -34,8 +36,9 @@ class ProcessScreen extends StatelessWidget {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (BuildContext context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+          var languageProvider = Provider.of<LanguageProvider>(context);
+          var currentLanguage = languageProvider.currentLanguage;
+          return Card(
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -78,7 +81,7 @@ class ProcessScreen extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                            'Date: 02/06/2024',
+                            '${currentLanguage.date}: 02/06/2024',
                             style: TextStyle(
                                 fontSize: 10,
                                 color: Theme.of(context).colorScheme.secondary),
@@ -96,7 +99,7 @@ class ProcessScreen extends StatelessWidget {
                               color: Colors.purple.shade800,
                             ),
                             child: Text(
-                              'Process',
+                              currentLanguage.process,
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,

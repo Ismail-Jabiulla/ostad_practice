@@ -2,6 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../../utiles/background_screen.dart';
 import '../../utiles/submit_button_widget.dart';
+import '../bottom_navigation_screen.dart';
 import 'log_in_screen.dart';
 
 class SetPasswordScreen extends StatefulWidget {
@@ -58,7 +59,10 @@ class _SetPasswordScreenState extends State<SetPasswordScreen> {
               ///submit button
               GestureDetector(
                 onTap: () {
-                  log('login Next');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LogInScreen()),
+                  );
                 },
                 child: const SubmitButtonWidget(
                   HIcon: Icons.keyboard_arrow_right_outlined,

@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/authenication/profile_update_screen.dart';
 import 'package:untitled/presentation/constant/image_constants.dart';
 import 'package:untitled/presentation/utiles/background_screen.dart';
+import '../../../localization/Language/language_bn.dart';
+import '../../../localization/Language/language_en.dart';
+import '../../../provider/language_provider.dart';
+import '../../../provider/theme_provider.dart';
 
 class ProfileScreen extends StatefulWidget {
-  final VoidCallback toggleTheme;
 
-  const ProfileScreen({Key? key, required this.toggleTheme}) : super(key: key);
+  const ProfileScreen({Key? key}) : super(key: key);
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -19,6 +23,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+
+    var languageProvider = Provider.of<LanguageProvider>(context);
+    var currentLanguage = languageProvider.currentLanguage;
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return BackgroundedScreen(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -45,13 +54,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  ///personal info
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16.0, horizontal: 8.0),
                     child: GestureDetector(
                       onTap: () {},
                       child: Text(
-                        'Personal Information',
+                        currentLanguage.personal_info,
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -59,6 +69,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
+                  ///language
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16.0, horizontal: 8.0),
@@ -68,7 +79,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Language',
+                            currentLanguage.language,
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
@@ -76,19 +87,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           ),
 
                           GestureDetector(
-                            onTap: (){
+                            onTap: () {
                               setState(() {
-                                _isSelectedLanguage =! _isSelectedLanguage;
+                                if (_isSelectedLanguage) {
+                                  languageProvider.changeLanguage(LanguageEn(), "LanguageEn");
+                                } else {
+                                  languageProvider.changeLanguage(LanguageBn(), "LanguageBn");
+                                }
+                                _isSelectedLanguage = !_isSelectedLanguage;
                               });
                             },
                             child: Container(
-                              child: _isSelectedLanguage? Text('বাংলা'): Text('English'),
+                              child: _isSelectedLanguage? const Text('বাংলা'): const Text('English'),
                             ),
                           )
                         ],
                       ),
                     ),
                   ),
+                  ///theme
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16.0, horizontal: 8.0),
@@ -96,33 +113,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Theme',
+                          currentLanguage.theme,
                           style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.secondary),
                         ),
+
                         GestureDetector(
                           onTap: (){
                             setState(() {
                               _isSelected =! _isSelected;
-                              widget.toggleTheme();
+                              themeProvider.toggleTheme();
                             });
                           },
                           child: Container(
-                            child: _isSelected? Icon(Icons.nightlight_outlined, color: Colors.white,): Icon(Icons.sunny, color: Colors.orange,),
+                            child: _isSelected? Icon(Icons.nightlight_outlined, color: Colors.black,): Icon(Icons.sunny, color: Colors.orange,),
                           ),
                         ),
                       ],
                     ),
                   ),
+                  ///version
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16.0, horizontal: 8.0),
                     child: GestureDetector(
                       onTap: () {},
                       child: Text(
-                        'Version',
+                        currentLanguage.version,
                         style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -130,6 +149,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
+                  ///logout
                   Padding(
                     padding: const EdgeInsets.symmetric(
                         vertical: 16.0, horizontal: 8.0),
@@ -139,7 +159,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
-                            'Logout',
+                            currentLanguage.logout,
                             style: TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,

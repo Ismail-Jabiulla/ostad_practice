@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled/presentation/app_screen/authenication/sign_up_screen.dart';
 import '../../utiles/background_screen.dart';
 import '../../utiles/submit_button_widget.dart';
+import '../bottom_navigation_screen.dart';
 import 'email_for_varification_screen.dart';
 
 class LogInScreen extends StatefulWidget {
@@ -55,6 +56,11 @@ class _LogInScreenState extends State<LogInScreen> {
               GestureDetector(
                 onTap: () {
                   log('login Next');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const BottomNavigationScreen()),
+                  );
+
                 },
                 child: const SubmitButtonWidget(
                   HIcon: Icons.keyboard_arrow_right_outlined,

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/new_task_screen.dart';
 import 'package:untitled/presentation/app_screen/process_screen.dart';
-import 'authenication/profile_screen.dart';
-import 'canceled_screen.dart';
+import '../../provider/language_provider.dart';
+import 'cancelled_screen.dart';
 import 'complete_screen.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
-  final VoidCallback toggleTheme;
 
-  const BottomNavigationScreen({Key? key, required this.toggleTheme})
+  const BottomNavigationScreen({Key? key})
       : super(key: key);
 
   @override
@@ -29,12 +29,15 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
       const CompeteScreen(),
       const CanceledScreen(),
       const ProcessScreen(),
-      ProfileScreen(toggleTheme: widget.toggleTheme),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+
+    var languageProvider = Provider.of<LanguageProvider>(context);
+    var currentLanguage = languageProvider.currentLanguage;
+
     return Scaffold(
       body: IndexedStack(
         index: _selectedIndex,
@@ -61,7 +64,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                         color:
                             _selectedIndex == 0 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary),
                     Text(
-                      'New Task',
+                      currentLanguage.task,
                       style: TextStyle(
                           fontSize: 10,
                           color: _selectedIndex == 0
@@ -89,7 +92,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                       color: _selectedIndex == 1 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
                     ),
                     Text(
-                      'Complete',
+                      currentLanguage.complete,
                       style: TextStyle(
                         fontSize: 10,
                         color:
@@ -117,7 +120,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                       color: _selectedIndex == 2 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
                     ),
                     Text(
-                      'Cancelled',
+                      currentLanguage.cancelled,
                       style: TextStyle(
                         fontSize: 10,
                         color:
@@ -145,39 +148,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                       color: _selectedIndex == 3 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
                     ),
                     Text(
-                      'Process',
+                      currentLanguage.process,
                       style: TextStyle(
                         fontSize: 10,
                         color:
                             _selectedIndex == 3 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
-            ///-----profile----
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 4;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.person,
-                      color: _selectedIndex == 4 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
-                    ),
-                    Text(
-                      'Profile',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color:
-                            _selectedIndex == 4 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                   ],

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../provider/language_provider.dart';
 import '../utiles/custom_appbar.dart';
 
 
@@ -12,7 +14,7 @@ class CanceledScreen extends StatelessWidget {
       appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
+          horizontal: 8.0,
         ),
         child: Stack(
           children: [
@@ -37,8 +39,11 @@ class CanceledScreen extends StatelessWidget {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (BuildContext context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+
+          var languageProvider = Provider.of<LanguageProvider>(context);
+          var currentLanguage = languageProvider.currentLanguage;
+
+          return Card(
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -65,7 +70,7 @@ class CanceledScreen extends StatelessWidget {
                           overflow: TextOverflow.ellipsis,
                           maxLines: 1,
                         ),
-
+            
                         ///sub title
                         Padding(
                           padding: const EdgeInsets.symmetric(vertical: 4.0),
@@ -79,15 +84,15 @@ class CanceledScreen extends StatelessWidget {
                           ),
                         ),
                         Padding(
-                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          padding: const EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                            'Date: 02/06/2024',
+                            '${currentLanguage.date}: 02/06/2024',
                             style: TextStyle(
                                 fontSize: 10,
                                 color: Theme.of(context).colorScheme.secondary),
                           ),
                         ),
-
+            
                         ///now
                         Padding(
                           padding: const EdgeInsets.only(top: 4.0),
@@ -99,7 +104,7 @@ class CanceledScreen extends StatelessWidget {
                               color: Colors.red.shade900,
                             ),
                             child: Text(
-                              'Cancelled',
+                              currentLanguage.cancelled,
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
@@ -112,7 +117,7 @@ class CanceledScreen extends StatelessWidget {
                       ],
                     ),
                   ),
-
+            
                   ///delete and edit
                   Expanded(
                     flex: 1,

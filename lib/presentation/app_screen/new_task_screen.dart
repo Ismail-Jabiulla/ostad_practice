@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/presentation/constant/image_constants.dart';
-
+import 'package:provider/provider.dart';
+import 'package:untitled/localization/Language/languages.dart';
+import '../../provider/language_provider.dart';
 import '../utiles/custom_appbar.dart';
 import 'add_task_screen.dart';
 
@@ -9,17 +10,20 @@ class NewTaskScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var languageProvider = Provider.of<LanguageProvider>(context);
+    var currentLanguage = languageProvider.currentLanguage;
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
       appBar: const CustomAppBar(),
       body: Padding(
         padding: const EdgeInsets.symmetric(
-          horizontal: 16.0,
+          horizontal: 8.0,
         ),
         child: Column(
           children: [
-            _taskCount(context),
+            _taskCount(context, currentLanguage),
             Expanded(
+              flex: 8,
               child: Stack(
                 children: [
                   const SizedBox(height: 8),
@@ -62,109 +66,56 @@ class NewTaskScreen extends StatelessWidget {
     );
   }
 
-  Widget _taskCount(context) {
-    return Container(
-      padding: const EdgeInsets.only(top: 16, bottom: 8),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '09',
-                  style: TextStyle(
+  Widget _taskCount(context, Languages currentLanguage) {
+    List<Map<String, String>> taskData = [
+      {'count': '09', 'label': '${currentLanguage.task}'},
+      {'count': '09', 'label': '${currentLanguage.complete}'},
+      {'count': '09', 'label': '${currentLanguage.cancelled}'},
+      {'count': '09', 'label': '${currentLanguage.process}'},
+
+    ];
+
+    return Expanded(
+      flex: 1,
+      child: ListView.builder(
+        padding: EdgeInsets.zero,
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        primary: false,
+        scrollDirection: Axis.horizontal,
+        itemCount: taskData.length,
+        itemBuilder: (context, index) {
+          return Card(
+            child: Container(
+              height: 40,
+              width: MediaQuery.of(context).size.width/4.8,
+              padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(8.0),
+                color: Theme.of(context).colorScheme.primary,
+              ),
+              child: Column(
+                children: [
+                  Text(
+                    taskData[index]['count'] ?? '',
+                    style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-                Text(
-                  'Cancelled',
-                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                  Text(
+                    taskData[index]['label'] ?? '',
+                    style: TextStyle(
                       fontSize: 10,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-              ],
+                      color: Theme.of(context).colorScheme.secondary,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '09',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-                Text(
-                  'Completed',
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '09',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-                Text(
-                  'Processing',
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(8.0),
-              color: Theme.of(context).colorScheme.primary,
-            ),
-            child: Column(
-              children: [
-                Text(
-                  '09',
-                  style: TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-                Text(
-                  'New Task',
-                  style: TextStyle(
-                      fontSize: 10,
-                      color: Theme.of(context).colorScheme.secondary),
-                ),
-              ],
-            ),
-          ),
-        ],
+          );
+        },
       ),
     );
   }
@@ -176,8 +127,9 @@ class NewTaskScreen extends StatelessWidget {
         shrinkWrap: true,
         primary: false,
         itemBuilder: (BuildContext context, index) {
-          return Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+          var languageProvider = Provider.of<LanguageProvider>(context);
+          var currentLanguage = languageProvider.currentLanguage;
+          return Card(
             child: Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -220,7 +172,7 @@ class NewTaskScreen extends StatelessWidget {
                         Padding(
                           padding: EdgeInsets.symmetric(vertical: 8.0),
                           child: Text(
-                            'Date: 02/06/2024',
+                            '${currentLanguage.date}: 02/06/2024',
                             style: TextStyle(
                                 fontSize: 10,
                                 color: Theme.of(context).colorScheme.secondary),
@@ -238,7 +190,7 @@ class NewTaskScreen extends StatelessWidget {
                               color: Colors.blue.shade800,
                             ),
                             child: Text(
-                              'Now',
+                              currentLanguage.newT,
                               style: TextStyle(
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,

@@ -1,14 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/presentation/constant/image_constants.dart';
 import 'package:untitled/presentation/utiles/custom_appbar.dart';
 import 'package:untitled/presentation/utiles/submit_button_widget.dart';
+
+import '../../provider/language_provider.dart';
 
 class AddNewTaskScreen extends StatelessWidget {
   const AddNewTaskScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    var languageProvider = Provider.of<LanguageProvider>(context);
+    var currentLanguage = languageProvider.currentLanguage;
+
     return Scaffold(
       appBar: const CustomAppBar(),
       body: Stack(
@@ -35,16 +41,16 @@ class AddNewTaskScreen extends StatelessWidget {
                           SizedBox(
                             height: MediaQuery.of(context).size.height * .05,
                           ),
-                          const Text(
-                            'Add New Task',
-                            style: TextStyle(
+                          Text(
+                            currentLanguage.add_newtask,
+                            style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(top: 16.0),
                             child: TextFormField(
-                              decoration: const InputDecoration(
-                                hintText: 'Subject',
+                              decoration: InputDecoration(
+                                hintText: currentLanguage.subject,
                               ),
                             ),
                           ),
@@ -52,8 +58,8 @@ class AddNewTaskScreen extends StatelessWidget {
                             padding: const EdgeInsets.only(top: 16.0),
                             child: TextFormField(
                               maxLines: 10,
-                              decoration: const InputDecoration(
-                                hintText: 'Description',
+                              decoration: InputDecoration(
+                                hintText: currentLanguage.description,
                               ),
                             ),
                           ),

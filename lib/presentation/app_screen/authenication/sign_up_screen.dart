@@ -12,6 +12,7 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
@@ -81,6 +82,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               GestureDetector(
                 onTap: () {
                   log('login Next');
+                  Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => const LogInScreen()),
+                  );
                 },
                 child: const SubmitButtonWidget(
                   HIcon: Icons.keyboard_arrow_right_outlined,
