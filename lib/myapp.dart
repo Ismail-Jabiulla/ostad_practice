@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/authenication/splash_screen.dart';
-import 'package:untitled/provider/language_provider.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:untitled/provider/theme_provider.dart';
+import 'data/provider/language_provider.dart';
+import 'data/provider/theme_provider.dart';
 
 class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
@@ -13,12 +13,13 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool _isDarkMode = false;
+  late LanguageProvider languageProvider;
 
-  void _toggleTheme() {
-    setState(() {
-      _isDarkMode = !_isDarkMode;
-    });
+  @override
+  void initState() {
+    languageProvider = Provider.of<LanguageProvider>(context, listen: false);
+    languageProvider.loadSavedLanguage();
+    super.initState();
   }
 
   @override
@@ -46,8 +47,6 @@ class _MyAppState extends State<MyApp> {
           borderSide: BorderSide(color: Theme.of(context).colorScheme.error)),
     );
 
-    LanguageProvider languageProvider = Provider.of<LanguageProvider>(context);
-    languageProvider.loadSavedLanguage();
     final themeProvider = Provider.of<ThemeProvider>(context);
 
     return Consumer<LanguageProvider>(
@@ -91,8 +90,7 @@ class _MyAppState extends State<MyApp> {
                     )
                 ),
 
-                // home: BottomNavigationScreen(),
-                home: SplashScreen(),
+                home: const SplashScreen(),
 
                 supportedLocales: const [
                   Locale('en', ''),
@@ -102,7 +100,6 @@ class _MyAppState extends State<MyApp> {
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
                 ],
 
                 localeResolutionCallback: (locale, supportedLocales) {

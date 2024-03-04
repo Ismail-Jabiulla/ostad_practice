@@ -1,8 +1,12 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/authenication/sign_up_screen.dart';
+import '../../../data/provider/auth_provider.dart';
 import '../../utiles/background_screen.dart';
+import '../../utiles/custom_snackbar.dart';
 import '../../utiles/submit_button_widget.dart';
+import '../../utiles/validator_check.dart';
 import '../bottom_navigation_screen.dart';
 import 'email_for_varification_screen.dart';
 
@@ -56,10 +60,7 @@ class _LogInScreenState extends State<LogInScreen> {
               GestureDetector(
                 onTap: () {
                   log('login Next');
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(builder: (context) => const BottomNavigationScreen()),
-                  );
+                  _checkValidation();
 
                 },
                 child: const SubmitButtonWidget(
@@ -124,4 +125,48 @@ class _LogInScreenState extends State<LogInScreen> {
     _emailController.dispose();
     _passwordController.dispose();
   }
+  void _checkValidation() async {
+    String email = _emailController.text;
+    String password = _passwordController.text;
+
+    String? status = await Provider.of<AuthenticationProvider>(context, listen: false)
+        .login(email, password);
+
+    if (status == '200') { // Note: Assuming status is returned as a String
+      Navigator.pushReplacement(
+        context,
+        PageRouteBuilder(
+          transitionDuration: Duration(milliseconds: 500),
+          pageBuilder: (_, __, ___) => BottomNavigationScreen(),
+          transitionsBuilder: (_, animation, __, child) {
+            return SlideTransition(
+              position: Tween<Offset>(
+                begin: Offset(1.0, 0.0),
+                end: Offset.zero,
+              ).animate(animation),
+              child: child,
+            );
+          },
+        ),
+      );
+      print("All Good!");
+    } else if (status == '404') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar(
+          message: "Wrong email",
+        ),
+      );
+      print("Wrong email");
+    } else if (status == '401') {
+      ScaffoldMessenger.of(context).showSnackBar(
+        CustomSnackbar(
+          message: "Wrong Password",
+        ),
+      );
+      print("Wrong Password");
+    }
+  }
+
+
 }
+

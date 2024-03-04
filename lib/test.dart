@@ -1,62 +1,69 @@
-// import 'package:flutter/cupertino.dart';
-// import 'package:flutter/material.dart';
-// import 'package:provider/provider.dart';
-// import 'package:untitled/provider/language_provider.dart';
-// import 'localization/Language/language_bn.dart';
-// import 'localization/Language/language_en.dart';
-//
-// class Home extends StatefulWidget {
-//   const Home({super.key});
-//
-//   @override
-//   State<Home> createState() => _HomeState();
-// }
-//
-// class _HomeState extends State<Home> {
-//   @override
-//   Widget build(BuildContext context) {
-//
-//     var languageProvider = Provider.of<LanguageProvider>(context);
-//     var currentLanguage = languageProvider.currentLanguage;
-//     return Scaffold(
-//       backgroundColor: Colors.white,
-//       appBar: AppBar(backgroundColor: Colors.black,title: Text(currentLanguage.appName, style: TextStyle(color: Colors.blue),),),
-//       body: Column(
-//         mainAxisAlignment: MainAxisAlignment.center,
-//         crossAxisAlignment: CrossAxisAlignment.center,
-//         children: [
-//           Center(
-//             child: Container(color: Colors.white,
-//                 width: double.maxFinite,
-//                 child: Center(child: Text( currentLanguage.welcome, style: TextStyle(color: Colors.black,fontSize: 40, fontWeight: FontWeight.bold),))),
-//           ),
-//           SizedBox(height: 56,),
-//
-//           //English
-//           GestureDetector(onTap: () {
-//             languageProvider.changeLanguage(LanguageEn(), "LanguageEn");
-//           },
-//             child: Container(
-//               decoration: BoxDecoration(borderRadius: BorderRadius.circular(60), color: Colors.blue,),
-//               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 24),
-//               child: Text("English", style: TextStyle(color: Colors.white),),
-//             ),
-//           ),
-//
-//           SizedBox(height: 8,),
-//
-//           //Arabic
-//           GestureDetector(onTap: () {
-//             languageProvider.changeLanguage(LanguageBn(), "LanguageAr");
-//           },
-//             child: Container(
-//               decoration: BoxDecoration(borderRadius: BorderRadius.circular(60), color: Colors.blue,),
-//               padding: EdgeInsets.symmetric(vertical: 10, horizontal: 24),
-//               child: Text("বাংলা", style: TextStyle(color: Colors.white),),
-//             ),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Update Profile Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: UpdateProfileScreen(),
+    );
+  }
+}
+
+class UpdateProfileScreen extends StatefulWidget {
+  @override
+  _UpdateProfileScreenState createState() => _UpdateProfileScreenState();
+}
+
+class _UpdateProfileScreenState extends State<UpdateProfileScreen> {
+  int clickCount = 0;
+
+  void handleClick() {
+    setState(() {
+      clickCount++;
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Update Profile Demo'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Text(
+              'Clicks: $clickCount',
+              style: TextStyle(fontSize: 20.0),
+            ),
+            SizedBox(height: 20.0),
+            ElevatedButton(
+              onPressed: handleClick,
+              child: Text('Update Profile'),
+            ),
+            SizedBox(height: 20.0),
+            if (clickCount > 0)
+              Text(
+                'You have clicked on the button $clickCount times.',
+                style: TextStyle(fontSize: 16.0),
+              ),
+            if (clickCount > 3)
+              const Text(
+                'Consider updating your profile!',
+                style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold, color: Colors.red),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}

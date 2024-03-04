@@ -24,6 +24,8 @@ dependencies:
   flutter_localization: ^0.2.0
   shared_preferences:
   provider:
+  day_night_switch: ^1.0.4
+  http:
 
 dev_dependencies:
   flutter_test:

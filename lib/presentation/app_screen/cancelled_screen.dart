@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../provider/language_provider.dart';
+import '../../data/provider/language_provider.dart';
 import '../utiles/custom_appbar.dart';
 
 

@@ -5,7 +5,7 @@ import 'package:untitled/presentation/constant/image_constants.dart';
 import 'package:untitled/presentation/utiles/custom_appbar.dart';
 import 'package:untitled/presentation/utiles/submit_button_widget.dart';
 
-import '../../provider/language_provider.dart';
+import '../../data/provider/language_provider.dart';
 
 class AddNewTaskScreen extends StatelessWidget {
   const AddNewTaskScreen({super.key});

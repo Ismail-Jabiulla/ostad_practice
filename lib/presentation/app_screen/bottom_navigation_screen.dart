@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/new_task_screen.dart';
 import 'package:untitled/presentation/app_screen/process_screen.dart';
-import '../../provider/language_provider.dart';
+import '../../data/provider/language_provider.dart';
 import 'cancelled_screen.dart';
 import 'complete_screen.dart';
 

@@ -40,5 +40,6 @@ abstract class Languages {
   String get mobile;
   String get first_name;
   String get last_name;
+  String get change_language;
 
 }

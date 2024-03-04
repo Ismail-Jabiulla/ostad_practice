@@ -106,4 +106,8 @@ class LanguageEn extends Languages {
 
   @override
   String get your_email => throw UnimplementedError();
+
+  @override
+  // TODO: implement aaa
+  String get change_language => "English";
 }
