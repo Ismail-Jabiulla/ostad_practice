@@ -24,6 +24,7 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
   bool _isLoginInProgress = false;
+  bool _obscurePassword = true;
 
   @override
   Widget build(BuildContext context) {
@@ -75,7 +76,21 @@ class _LogInScreenState extends State<LogInScreen> {
   Widget _buildPasswordForm(){
     return TextFormField(
       controller: _passwordController,
-      decoration: const InputDecoration(hintText: 'Password'),
+      obscureText: _obscurePassword,
+      decoration: InputDecoration(
+        hintText: 'Password',
+        suffixIcon: IconButton(
+          icon: Icon(
+            _obscurePassword ? Icons.visibility : Icons.visibility_off,
+            color: _obscurePassword ? Colors.grey : Colors.blue,
+          ),
+          onPressed: () {
+            setState(() {
+              _obscurePassword = !_obscurePassword;
+            });
+          },
+        ),
+      ),
       validator: (String? value) {
         if (value?.trim().isEmpty ?? true) {
           return "Enter Your Password";
