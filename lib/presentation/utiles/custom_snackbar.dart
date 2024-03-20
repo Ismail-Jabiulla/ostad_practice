@@ -1,28 +1,11 @@
 import 'package:flutter/material.dart';
 
-import '../constant/color_constant.dart';
-
-class CustomSnackbar extends SnackBar {
-  final String message;
-  @override
-  final Color backgroundColor;
-  final Color textColor;
-
-  CustomSnackbar({
-    required this.message,
-    Key? key,
-    this.backgroundColor = Colors.green, // Default background color
-    this.textColor = colorWhite, // Default text color
-    Duration duration = const Duration(seconds: 2),
-  }) : super(
-    key: key,
-    content: Center(
-      child: Text(
-        message,
-        style: TextStyle(color: textColor),
-      ),
+void showSnackBarMessage(BuildContext context, String message,
+    [bool isErrorMessage = false]) {
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(message),
+      backgroundColor: isErrorMessage ? Colors.red : null,
     ),
-    duration: duration,
-    backgroundColor: backgroundColor,
   );
 }

@@ -26,6 +26,8 @@ dependencies:
   provider:
   day_night_switch: ^1.0.4
   http:
+  image_picker: ^1.0.7
+  path_provider: ^2.1.2
 
 dev_dependencies:
   flutter_test:

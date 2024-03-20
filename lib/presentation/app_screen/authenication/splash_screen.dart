@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import '../../../data/provider/auth_provider.dart';
-import '../../../data/shared preferance/auth_shared_preferance.dart';
+import 'package:untitled/data/controller/auth_controller.dart';
 import '../../constant/image_constants.dart';
 import '../../utiles/background_screen.dart';
 import '../bottom_navigation_screen.dart';
@@ -15,47 +14,50 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  late String token;
-
   @override
   void initState() {
-    fetchData();
+    _moveToNextScreen();
     super.initState();
   }
 
-  fetchData() async {
-    token = await AuthenticationProvider().getTokenFromSharedPreferences() ?? '';
+  Future<void> _moveToNextScreen() async {
+    await Future.delayed(const Duration(seconds: 2));
 
-    if (token.isEmpty) {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => LogInScreen()),
+    bool isLoggedIn = await AuthController.isUserLoggedIn();
+
+    if (mounted) {
+      if (isLoggedIn) {
+        {
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => const BottomNavigationScreen()),
               (route) => false);
-    } else {
-      Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(builder: (context) => BottomNavigationScreen()),
-              (route) => false);
+        }
+      } else {
+        Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const LogInScreen()),
+            (route) => false);
+      }
     }
-
-    print("Token from splash: $token");
   }
 
   @override
   Widget build(BuildContext context) {
     return BackgroundedScreen(
         child: Center(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: EdgeInsets.only(
-                    top: MediaQuery.of(context).size.height * .45),
-                child: SvgPicture.asset(AssetsPath.Logo),
-              ),
-            ],
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Padding(
+            padding:
+                EdgeInsets.only(top: MediaQuery.of(context).size.height * .45),
+            child: SvgPicture.asset(AssetsPath.Logo),
           ),
-        ));
+        ],
+      ),
+    ));
   }
 }

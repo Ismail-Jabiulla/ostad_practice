@@ -21,7 +21,7 @@ class LanguageEn extends Languages {
   String get cancelled => "Cancelled";
 
   @override
-  String get complete => "Complete";
+  String get complete => "Completed";
 
   @override
   String get logout => "Logout";
@@ -33,7 +33,7 @@ class LanguageEn extends Languages {
   String get personal_info => "Personal Information";
 
   @override
-  String get process => "Process";
+  String get process => "Progress";
 
   @override
   String get profile => "profile";

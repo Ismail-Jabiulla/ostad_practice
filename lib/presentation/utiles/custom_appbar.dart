@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import '../app_screen/authenication/profile_screen.dart';
+import 'package:untitled/data/controller/auth_controller.dart';
 import '../constant/image_constants.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
-  const CustomAppBar({super.key});
+  Function callBack;
+   CustomAppBar({required this.callBack, super.key});
 
   @override
   Size get preferredSize => const Size.fromHeight(kToolbarHeight);
@@ -15,8 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ///user photo
       leading: GestureDetector(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ProfileScreen()));
+         callBack();
         },
         child: Padding(
           padding: const EdgeInsets.only(left: 16.0),
@@ -37,18 +37,17 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       ///User Name
       title: GestureDetector(
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) =>  ProfileScreen()));
+          callBack();
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Daniella Amato',
+            Text(AuthController.userData!.fullName,
                 style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.bold,
                     color: Theme.of(context).colorScheme.onSecondary)),
-            Text('App Developer',
+            Text(AuthController.userData!.email ?? '',
                 style: TextStyle(fontSize: 12, color: Theme.of(context).colorScheme.onSecondary)),
           ],
         ),
@@ -58,4 +57,5 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       backgroundColor: Theme.of(context).colorScheme.onPrimary,
     );
   }
+
 }

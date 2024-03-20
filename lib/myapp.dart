@@ -5,14 +5,16 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'data/provider/language_provider.dart';
 import 'data/provider/theme_provider.dart';
 
-class MyApp extends StatefulWidget {
-  const MyApp({Key? key}) : super(key: key);
+class TaskManager extends StatefulWidget {
+  const TaskManager({Key? key}) : super(key: key);
+
+  static GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
   @override
-  State<MyApp> createState() => _MyAppState();
+  State<TaskManager> createState() => _TaskManagerState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _TaskManagerState extends State<TaskManager> {
   late LanguageProvider languageProvider;
 
   @override

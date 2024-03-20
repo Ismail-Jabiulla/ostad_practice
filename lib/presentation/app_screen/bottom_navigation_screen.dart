@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:untitled/presentation/app_screen/new_task_screen.dart';
-import 'package:untitled/presentation/app_screen/process_screen.dart';
+import 'package:untitled/presentation/app_screen/progress_screen.dart';
 import '../../data/provider/language_provider.dart';
 import 'cancelled_screen.dart';
 import 'complete_screen.dart';
@@ -26,9 +26,9 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     super.initState();
     _screens = [
       const NewTaskScreen(),
-      const CompeteScreen(),
-      const CanceledScreen(),
-      const ProcessScreen(),
+      const CompleteScreen(),
+      const CancelledScreen(),
+      const ProgressScreen(),
     ];
   }
 
@@ -104,34 +104,6 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
               ),
             ),
 
-            ///----- Canceled-----
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  _selectedIndex = 2;
-                });
-              },
-              child: Container(
-                padding: const EdgeInsets.all(8),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.cancel_outlined,
-                      color: _selectedIndex == 2 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
-                    ),
-                    Text(
-                      currentLanguage.cancelled,
-                      style: TextStyle(
-                        fontSize: 10,
-                        color:
-                            _selectedIndex == 2 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-
             ///-----Process----
             GestureDetector(
               onTap: () {
@@ -153,6 +125,35 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                         fontSize: 10,
                         color:
                             _selectedIndex == 3 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+
+
+            ///----- Canceled-----
+            GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedIndex = 2;
+                });
+              },
+              child: Container(
+                padding: const EdgeInsets.all(8),
+                child: Column(
+                  children: [
+                    Icon(
+                      Icons.cancel_outlined,
+                      color: _selectedIndex == 2 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
+                    ),
+                    Text(
+                      currentLanguage.cancelled,
+                      style: TextStyle(
+                        fontSize: 10,
+                        color:
+                        _selectedIndex == 2 ? Colors.green.shade600 : Theme.of(context).colorScheme.secondary,
                       ),
                     ),
                   ],

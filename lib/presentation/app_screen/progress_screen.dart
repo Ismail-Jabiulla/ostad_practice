@@ -1,33 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled/data/services/network_caller.dart';
-import 'package:untitled/data/utility/app_url.dart';
-import 'package:untitled/presentation/utiles/card_item_widget.dart';
-import 'package:untitled/presentation/utiles/custom_snackbar.dart';
-import '../../data/model/task_list_wrapper.dart';
 import '../../data/provider/language_provider.dart';
 import '../utiles/custom_appbar.dart';
 import 'authenication/profile_screen.dart';
+import '../../data/model/task_list_wrapper.dart';
+import '../../data/services/network_caller.dart';
+import '../../data/utility/app_url.dart';
+import '../utiles/card_item_widget.dart';
+import '../utiles/custom_snackbar.dart';
 
-class CompleteScreen extends StatefulWidget {
-  const CompleteScreen({Key? key}) : super(key: key);
+
+class ProgressScreen extends StatefulWidget {
+  const ProgressScreen({Key? key}) : super(key: key);
 
   @override
-  State<CompleteScreen> createState() => _CompleteScreenState();
+  State<ProgressScreen> createState() => _ProgressScreenState();
 }
 
-class _CompleteScreenState extends State<CompleteScreen> {
-  late bool _getCompletedTaskListInProgress = false;
-  late TaskListWrapper _completeTaskListWrapper = TaskListWrapper();
+class _ProgressScreenState extends State<ProgressScreen> {
+  late bool _getProgressTaskListInProgress = false;
+  late TaskListWrapper _progressTaskListWrapper = TaskListWrapper();
 
   @override
   void initState() {
     super.initState();
-    _getAllCompleteTaskList();
+    _getAllProgressTaskList();
   }
 
   @override
   Widget build(BuildContext context) {
+
     var languageProvider = Provider.of<LanguageProvider>(context);
     var currentLanguage = languageProvider.currentLanguage;
 
@@ -58,24 +60,23 @@ class _CompleteScreenState extends State<CompleteScreen> {
 
   Widget _buildItemUpdate() {
     return Visibility(
-      visible: _completeTaskListWrapper.taskList?.isNotEmpty ?? false,
+
+      visible: _progressTaskListWrapper.taskList?.isNotEmpty ?? false,
       replacement: Center(child: Text('No item')),
 
       child: ListView.builder(
         padding: EdgeInsets.zero,
-        itemCount: _completeTaskListWrapper.taskList?.length ?? 0,
+        itemCount: _progressTaskListWrapper.taskList?.length ?? 0,
         shrinkWrap: true,
         primary: false,
-
         itemBuilder: (BuildContext context, index) {
           var languageProvider = Provider.of<LanguageProvider>(context);
           var currentLanguage = languageProvider.currentLanguage;
-
           return CardItemWidget(
-            taskItem: _completeTaskListWrapper.taskList![index],
+            taskItem: _progressTaskListWrapper.taskList![index],
             refreshData: () {
               _refreshData();
-            }, taskStatus: currentLanguage.complete, taskStatusColor: Colors.purple.shade800,
+            }, taskStatus: currentLanguage.process, taskStatusColor: Colors.green.shade800,
           );
         },
       ),
@@ -83,26 +84,28 @@ class _CompleteScreenState extends State<CompleteScreen> {
   }
 
   Future<void> _refreshData() async {
-    await _getAllCompleteTaskList();
+    await _getAllProgressTaskList();
   }
 
-  Future<void> _getAllCompleteTaskList() async {
-    _getCompletedTaskListInProgress = true;
+  Future<void> _getAllProgressTaskList() async {
+    _getProgressTaskListInProgress = true;
     setState(() {});
-    final response = await NetworkCaller.getRequest(Urls.completedTaskList);
+    final response = await NetworkCaller.getRequest(Urls.progressTaskList);
+
+    print('Progress Task ${Urls.progressTaskList}');
 
     if (response.isSuccess) {
-      _completeTaskListWrapper = TaskListWrapper.fromJson(response.responseBody);
-      _getCompletedTaskListInProgress = false;
+      _progressTaskListWrapper = TaskListWrapper.fromJson(response.responseBody);
+      _getProgressTaskListInProgress = false;
       setState(() {});
     } else {
-      _getCompletedTaskListInProgress = false;
+      _getProgressTaskListInProgress = false;
       setState(() {});
       showSnackBarMessage(
         context,
         response.errorMessage ?? 'Get complete task list has been failed',
       );
     }
-    setState(() => _getCompletedTaskListInProgress = false);
+    setState(() => _getProgressTaskListInProgress = false);
   }
 }
