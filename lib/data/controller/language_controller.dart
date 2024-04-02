@@ -1,44 +1,47 @@
+
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import '../../localization/Language/language_bn.dart';
 import '../../localization/Language/language_en.dart';
 import '../../localization/Language/languages.dart';
 
-class LanguageProvider extends ChangeNotifier {
+class LanguageController extends GetxController {
+  final _box = GetStorage();
   Languages _currentLanguage = LanguageEn(); // Default language
 
   Languages get currentLanguage => _currentLanguage;
 
   Future<void> changeLanguage(Languages newLanguage, String language) async {
     _currentLanguage = newLanguage;
-    notifyListeners();
+    update();
 
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString('selectedLanguage', language);
+    _box.write('selectedLanguage', language);
   }
 
-  Future<void> loadSavedLanguage() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? selectedLanguage = prefs.getString('selectedLanguage');
+  @override
+  void onInit() {
+    super.onInit();
+    _loadSavedLanguage();
+  }
+
+  Future<void> _loadSavedLanguage() async {
+    String? selectedLanguage = _box.read('selectedLanguage');
     print(selectedLanguage);
 
     if (selectedLanguage != null) {
       switch (selectedLanguage) {
-
         case 'LanguageEn':
           _currentLanguage = LanguageEn();
-          notifyListeners();
-          print("${selectedLanguage} SET");
+          print("$selectedLanguage SET");
           break;
-
         case 'LanguageBn':
           _currentLanguage = LanguageBn();
-           notifyListeners();
-          print("${selectedLanguage} SET");
+          print("$selectedLanguage SET");
           break;
       // Add more language cases as needed
       }
-      notifyListeners();
+      update();
     }
   }
 

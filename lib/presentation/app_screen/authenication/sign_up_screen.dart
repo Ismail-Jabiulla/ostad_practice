@@ -1,12 +1,11 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:untitled/data/services/network_caller.dart';
-import 'package:untitled/data/utility/app_url.dart';
 import 'package:untitled/presentation/utiles/background_screen.dart';
-import '../../../data/model/response_object.dart';
+import '../../../data/controller/auth/signup_controller.dart';
 import '../../utiles/custom_snackbar.dart';
 import '../../utiles/submit_button_widget.dart';
 import 'log_in_screen.dart';
+import 'package:get/get.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -22,8 +21,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _mobileController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
-  bool _isRegistrationInProgress = false;
   bool _obscurePassword = true;
+  final SignUpController _signUpController = Get.find<SignUpController>();
 
   @override
   Widget build(BuildContext context) {
@@ -146,55 +145,29 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _buildSubmitButton() {
-    return GestureDetector(
-      onTap: () async {
-        log('login Next');
-        // Navigator.pushReplacement(
-        //   context,
-        //   MaterialPageRoute(builder: (context) => const LogInScreen()),
-        // );
+    return GestureDetector(onTap: () async {
+      log('login Next');
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LogInScreen()),
+      );
 
-        if (_globalKey.currentState!.validate()) {
-          _isRegistrationInProgress = true;
-          setState(() {});
-          Map<String, dynamic> inputParams = {
-            "email": _emailController.text.trim(),
-            "firstName": _firstNameController.text.trim(),
-            "lastName": _lastNameController.text.trim(),
-            "mobile": _mobileController.text.trim(),
-            "password": _passwordController.text,
-          };
-
-          final ResponseObject response =
-              await NetworkCaller.postRequest(Urls.registration, inputParams);
-
-          _isRegistrationInProgress = false;
-          setState(() {});
-
-          if (response.isSuccess) {
-            if (mounted) {
-              showSnackBarMessage(context, 'Registration Successful');
-              Navigator.pop(context);
-            }
-          } else {
-            if (mounted) {
-              showSnackBarMessage(context, 'Registration Failed, try again.');
-            }
-          }
-        }
-      },
-      child: Visibility(
-        visible: _isRegistrationInProgress == false,
-        replacement: const Center(
-          child: CircularProgressIndicator(
-            color: Colors.grey,
+      await signup();
+    }, child: GetBuilder<SignUpController>(
+      builder: (signInController) {
+        return Visibility(
+          visible: signInController.inProgress == false,
+          replacement: const Center(
+            child: CircularProgressIndicator(
+              color: Colors.grey,
+            ),
           ),
-        ),
-        child: const SubmitButtonWidget(
-          HIcon: Icons.keyboard_arrow_right_outlined,
-        ),
-      ),
-    );
+          child: const SubmitButtonWidget(
+            HIcon: Icons.keyboard_arrow_right_outlined,
+          ),
+        );
+      },
+    ));
   }
 
   Widget _buildforgetPassword() {
@@ -242,6 +215,27 @@ class _SignUpScreenState extends State<SignUpScreen> {
         ],
       ),
     );
+  }
+
+  Future<void> signup() async {
+    final result = await _signUpController.signup(
+        _globalKey,
+        _emailController.text.trim(),
+        _firstNameController.text.trim(),
+        _lastNameController.text.trim(),
+        _mobileController.text.trim(),
+        _passwordController.text);
+
+    if (result) {
+      if (mounted) {
+        showSnackBarMessage(context, 'Registration Successful');
+        Navigator.pop(context);
+      }
+    } else {
+      if (mounted) {
+        showSnackBarMessage(context, 'Registration Failed, try again.');
+      }
+    }
   }
 
   @override

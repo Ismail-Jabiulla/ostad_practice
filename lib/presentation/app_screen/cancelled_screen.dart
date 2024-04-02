@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../data/model/task_list_wrapper.dart';
-import '../../data/provider/language_provider.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utility/app_url.dart';
+import 'package:get/get.dart';
+import 'package:untitled/data/controller/task_manage/cancelled_controller.dart';
+import '../../data/controller/language_controller.dart';
 import '../utiles/card_item_widget.dart';
 import '../utiles/custom_appbar.dart';
-import '../utiles/custom_snackbar.dart';
 import 'authenication/profile_screen.dart';
-
 
 class CancelledScreen extends StatefulWidget {
   const CancelledScreen({Key? key}) : super(key: key);
@@ -18,20 +14,18 @@ class CancelledScreen extends StatefulWidget {
 }
 
 class _CancelledScreenState extends State<CancelledScreen> {
-  late bool _getCancelledTaskListInProgress = false;
-  late TaskListWrapper _cancelledTaskListWrapper = TaskListWrapper();
+  final CancelledController _controller = Get.put(CancelledController());
 
   @override
   void initState() {
     super.initState();
-    _refreshData();
+    _controller.refreshData();
   }
 
   @override
   Widget build(BuildContext context) {
-
-    var languageProvider = Provider.of<LanguageProvider>(context);
-    var currentLanguage = languageProvider.currentLanguage;
+    var languageController = Get.find<LanguageController>();
+    var currentLanguage = languageController.currentLanguage;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -42,16 +36,14 @@ class _CancelledScreenState extends State<CancelledScreen> {
         },
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshData,
+        onRefresh: _controller.refreshData,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 const SizedBox(height: 8),
-                _buildItemUpdate(),
+                _buildItemUpdate(currentLanguage),
               ],
             ),
           ),
@@ -60,57 +52,28 @@ class _CancelledScreenState extends State<CancelledScreen> {
     );
   }
 
-  Widget _buildItemUpdate() {
-    return Visibility(
-
-      visible: _cancelledTaskListWrapper.taskList?.isNotEmpty ?? false,
-      replacement: Center(child: Text('No item')),
-
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: _cancelledTaskListWrapper.taskList?.length ?? 0,
-        shrinkWrap: true,
-        primary: false,
-        itemBuilder: (BuildContext context, index) {
-
-          var languageProvider = Provider.of<LanguageProvider>(context);
-          var currentLanguage = languageProvider.currentLanguage;
-
-          return CardItemWidget(
-            taskItem: _cancelledTaskListWrapper.taskList![index],
-            refreshData: () {
-              _refreshData();
-            }, taskStatus: currentLanguage.cancelled, taskStatusColor: Colors.red.shade800,
-          );
-        },
-      ),
-    );
-  }
-
-  Future<void> _refreshData() async {
-    await _getAllCancelledTaskList();
-  }
-
-  Future<void> _getAllCancelledTaskList() async {
-    _getCancelledTaskListInProgress = true;
-    setState(() {});
-    final response = await NetworkCaller.getRequest(Urls.cancelledTaskList);
-
-    print('cancelled Task ${Urls.cancelledTaskList}');
-
-    if (response.isSuccess) {
-      _cancelledTaskListWrapper = TaskListWrapper.fromJson(response.responseBody);
-
-      _getCancelledTaskListInProgress = false;
-      setState(() {});
-    } else {
-      _getCancelledTaskListInProgress = false;
-      setState(() {});
-      showSnackBarMessage(
-        context,
-        response.errorMessage ?? 'Get complete task list has been failed',
+  Widget _buildItemUpdate(currentLanguage) {
+    return GetBuilder<CancelledController>(builder: (controller){
+      return Visibility(
+        visible: controller.cancelledTaskListWrapper.taskList?.isNotEmpty ?? false,
+        replacement: const Center(child: Text('No item')),
+        child: ListView.builder(
+          padding: EdgeInsets.zero,
+          itemCount: controller.cancelledTaskListWrapper.taskList?.length ?? 0,
+          shrinkWrap: true,
+          primary: false,
+          itemBuilder: (BuildContext context, index) {
+            return CardItemWidget(
+              taskItem: controller.cancelledTaskListWrapper.taskList![index],
+              refreshData: () {
+                controller.refreshData();
+              },
+              taskStatus: currentLanguage.cancelled,
+              taskStatusColor: Colors.red.shade800,
+            );
+          },
+        ),
       );
-    }
-    setState(() => _getCancelledTaskListInProgress = false);
+    });
   }
 }

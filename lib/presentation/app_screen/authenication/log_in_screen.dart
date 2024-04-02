@@ -1,16 +1,13 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:untitled/data/controller/auth_controller.dart';
-import 'package:untitled/data/model/response_object.dart';
-import 'package:untitled/data/services/network_caller.dart';
-import 'package:untitled/data/utility/app_url.dart';
+import 'package:untitled/data/controller/auth/login_controller.dart';
 import 'package:untitled/presentation/app_screen/authenication/sign_up_screen.dart';
-import '../../../data/model/login_response.dart';
 import '../../utiles/background_screen.dart';
 import '../../utiles/custom_snackbar.dart';
 import '../../utiles/submit_button_widget.dart';
 import '../bottom_navigation_screen.dart';
 import 'email_for_varification_screen.dart';
+import 'package:get/get.dart';
 
 class LogInScreen extends StatefulWidget {
   const LogInScreen({super.key});
@@ -23,8 +20,8 @@ class _LogInScreenState extends State<LogInScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
-  bool _isLoginInProgress = false;
   bool _obscurePassword = true;
+  final LoginController _loginController = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +30,8 @@ class _LogInScreenState extends State<LogInScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 32.0),
         child: Form(
           key: _globalKey,
-
           child: Column(
             children: [
-
               SizedBox(
                 height: MediaQuery.of(context).size.height * .2,
               ),
@@ -44,7 +39,6 @@ class _LogInScreenState extends State<LogInScreen> {
                 'Get Started With',
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
-
               const SizedBox(height: 16),
               _buildEmailForm(),
               const SizedBox(height: 16),
@@ -59,7 +53,7 @@ class _LogInScreenState extends State<LogInScreen> {
     );
   }
 
-  Widget _buildEmailForm(){
+  Widget _buildEmailForm() {
     return TextFormField(
       keyboardType: TextInputType.emailAddress,
       controller: _emailController,
@@ -73,7 +67,7 @@ class _LogInScreenState extends State<LogInScreen> {
     );
   }
 
-  Widget _buildPasswordForm(){
+  Widget _buildPasswordForm() {
     return TextFormField(
       controller: _passwordController,
       obscureText: _obscurePassword,
@@ -100,7 +94,7 @@ class _LogInScreenState extends State<LogInScreen> {
     );
   }
 
-  Widget _buildSubmitButton(){
+  Widget _buildSubmitButton() {
     return GestureDetector(
       onTap: () {
         log('login Next');
@@ -109,21 +103,25 @@ class _LogInScreenState extends State<LogInScreen> {
           _login();
         }
       },
-      child: Visibility(
-        visible: _isLoginInProgress == false,
-        replacement: const Center(
-          child: CircularProgressIndicator(
-            color: Colors.grey,
-          ),
-        ),
-        child: const SubmitButtonWidget(
-          HIcon: Icons.keyboard_arrow_right_outlined,
-        ),
+      child: GetBuilder<LoginController>(
+        builder: (logInController) {
+          return Visibility(
+            visible: logInController.inProgress == false,
+            replacement: const Center(
+              child: CircularProgressIndicator(
+                color: Colors.grey,
+              ),
+            ),
+            child: const SubmitButtonWidget(
+              HIcon: Icons.keyboard_arrow_right_outlined,
+            ),
+          );
+        },
       ),
     );
   }
 
-  Widget _buildBottomSide(){
+  Widget _buildBottomSide() {
     return Column(
       children: [
         Padding(
@@ -131,9 +129,11 @@ class _LogInScreenState extends State<LogInScreen> {
           child: GestureDetector(
             onTap: () {
               Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const EmailVerification()));
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const EmailVerification(),
+                ),
+              );
             },
             child: Text(
               'forget Password?',
@@ -142,7 +142,6 @@ class _LogInScreenState extends State<LogInScreen> {
           ),
         ),
         const SizedBox(height: 8),
-
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -156,9 +155,11 @@ class _LogInScreenState extends State<LogInScreen> {
               onTap: () {
                 log('SignIn');
                 Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const SignUpScreen()));
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const SignUpScreen(),
+                  ),
+                );
               },
               child: const Text(
                 ' Sign Up',
@@ -177,42 +178,21 @@ class _LogInScreenState extends State<LogInScreen> {
   }
 
   Future<void> _login() async {
-    _isLoginInProgress = true;
-    setState(() {});
-    Map<String, dynamic> inputParam = {
-      "email": _emailController.text.trim(),
-      "password": _passwordController.text,
-    };
+    final result = await _loginController.login(
+        _emailController.text.trim(), _passwordController.text);
 
-    final ResponseObject response =
-        await NetworkCaller.postRequest(Urls.login, inputParam);
-
-    _isLoginInProgress = false;
-    setState(() {});
-
-    if (response.isSuccess) {
-      if (!mounted) {
-        return;
-      }
-
-      LoginResponse loginResponse =
-          LoginResponse.fromJson(response.responseBody);
-      print(loginResponse.userData?.firstName);
-
-      ///Save Data
-      await AuthController.saveUserData(loginResponse.userData!);
-      await AuthController.saveUserToken(loginResponse.token!);
-
+    if (result == true) {
       if (mounted) {
         Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => const BottomNavigationScreen()));
+          context,
+          MaterialPageRoute(
+            builder: (context) =>  BottomNavigationScreen(),
+          ),
+        );
       }
     } else {
       if (mounted) {
-        showSnackBarMessage(
-            context, response.errorMessage ?? "Login failed! try again.");
+        showSnackBarMessage(context, _loginController.errorMessage);
       }
     }
   }

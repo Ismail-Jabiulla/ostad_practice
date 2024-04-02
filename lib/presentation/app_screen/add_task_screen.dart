@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled/data/services/network_caller.dart';
-import 'package:untitled/data/utility/app_url.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
+import 'package:untitled/data/controller/task_manage/add_task_controller.dart';
 import 'package:untitled/presentation/constant/image_constants.dart';
 import 'package:untitled/presentation/utiles/custom_appbar.dart';
 import 'package:untitled/presentation/utiles/submit_button_widget.dart';
-import '../../data/provider/language_provider.dart';
-import '../utiles/custom_snackbar.dart';
+import '../../data/controller/language_controller.dart';
 import 'authenication/profile_screen.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
@@ -19,15 +18,12 @@ class AddNewTaskScreen extends StatefulWidget {
 
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
 
-  final TextEditingController _subjectController = TextEditingController();
-  final TextEditingController _descriptionController = TextEditingController();
-  final GlobalKey<FormState> _globalKey = GlobalKey<FormState>();
-  bool _addTaskInProgress = false;
+  final AddTaskController controller = Get.put(AddTaskController());
 
   @override
   Widget build(BuildContext context) {
-    var languageProvider = Provider.of<LanguageProvider>(context);
-    var currentLanguage = languageProvider.currentLanguage;
+    var languageController = Get.find<LanguageController>();
+    var currentLanguage = languageController.currentLanguage;
 
     return Scaffold(
       appBar: CustomAppBar(
@@ -50,7 +46,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
             color: Theme.of(context).colorScheme.background,
 
             child: Form(
-              key: _globalKey,
+              key: controller.globalKey,
               child: Column(
                 children: [
                   Expanded(
@@ -73,7 +69,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16.0),
                               child: TextFormField(
-                                controller: _subjectController,
+                                controller: controller.subjectController,
                                 decoration: InputDecoration(
                                   hintText: currentLanguage.subject,
                                 ),
@@ -90,7 +86,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                             Padding(
                               padding: const EdgeInsets.only(top: 16.0),
                               child: TextFormField(
-                                  controller: _descriptionController,
+                                  controller: controller.descriptionController,
                                   maxLines: 10,
                                   decoration: InputDecoration(
                                     hintText: currentLanguage.description,
@@ -110,24 +106,26 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                             GestureDetector(
                               onTap: () {
                                 print("click - Add New Task");
-                                if (_globalKey.currentState != null && _globalKey.currentState!.validate()) {
-                                  _addNewTask();
+                                if (controller.globalKey.currentState != null && controller.globalKey.currentState!.validate()) {
+                                  controller.addNewTask();
                                 }
                               },
-                              child: Visibility(
-                                visible: _addTaskInProgress == false,
-                                replacement:  const Center(
-                                  child: CircularProgressIndicator(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                                child: const SubmitButtonWidget(
-                                  HIcon: Icons.keyboard_arrow_right_outlined,
-                                ),
+                              child: GetBuilder<AddTaskController>(
+                                builder: (controller) {
+                                  return Visibility(
+                                    visible: controller?.inProgress == false,
+                                    replacement: const Center(
+                                      child: CircularProgressIndicator(
+                                        color: Colors.green,
+                                      ),
+                                    ),
+                                    child: const SubmitButtonWidget(
+                                      HIcon: Icons.keyboard_arrow_right_outlined,
+                                    ),
+                                  );
+                                },
                               ),
                             ),
-
-
                           ],
                         ),
                       ),
@@ -140,42 +138,5 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         ],
       ),
     );
-  }
-
-  Future<void> _addNewTask() async {
-    _addTaskInProgress = true;
-    setState(() {});
-
-    Map<String, dynamic> inputParams = {
-      "title": _subjectController.text.trim(),
-      "description": _descriptionController.text.trim(),
-      "status": "New"
-    };
-
-    final response =
-    await NetworkCaller.postRequest(Urls.createTask, inputParams);
-
-    _addTaskInProgress = false;
-    setState(() {});
-
-    if (response.isSuccess) {
-      _subjectController.clear();
-      _descriptionController.clear();
-      if (mounted) {
-        showSnackBarMessage(context, 'New task has been added!');
-      }
-    } else {
-      if (mounted) {
-        showSnackBarMessage(
-            context, response.errorMessage ?? 'Add new task failed!', true);
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _subjectController.dispose();
-    _descriptionController.dispose();
-    super.dispose();
   }
 }

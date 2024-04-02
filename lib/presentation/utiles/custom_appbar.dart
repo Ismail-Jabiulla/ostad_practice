@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled/data/controller/auth_controller.dart';
+import 'package:untitled/data/controller/auth/auth_controller.dart';
 import '../constant/image_constants.dart';
 
 class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {

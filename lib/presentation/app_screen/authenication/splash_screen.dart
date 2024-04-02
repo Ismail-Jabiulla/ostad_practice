@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:untitled/data/controller/auth_controller.dart';
+import 'package:untitled/data/controller/auth/auth_controller.dart';
 import '../../constant/image_constants.dart';
 import '../../utiles/background_screen.dart';
 import '../bottom_navigation_screen.dart';
@@ -31,7 +31,7 @@ class _SplashScreenState extends State<SplashScreen> {
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
-                  builder: (context) => const BottomNavigationScreen()),
+                  builder: (context) =>  BottomNavigationScreen()),
               (route) => false);
         }
       } else {

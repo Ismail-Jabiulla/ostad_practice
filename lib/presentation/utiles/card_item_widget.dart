@@ -1,35 +1,40 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:get/get.dart';
+import '../../data/controller/bottom_nav_controller.dart';
+import '../../data/controller/task_delete_controller.dart';
+import '../../data/controller/task_update_controller.dart';
 import '../../data/model/task_tem.dart';
-import '../../data/provider/language_provider.dart';
-import '../../data/services/network_caller.dart';
-import '../../data/utility/app_url.dart';
-import 'custom_snackbar.dart';
-import 'ontap_alert_dialog.dart';
+import '../../data/controller/language_controller.dart';
 
 class CardItemWidget extends StatefulWidget {
-
   final TaskItem taskItem;
   final VoidCallback refreshData;
   final String taskStatus;
   final Color taskStatusColor;
 
-  const CardItemWidget({Key? key, required this.taskItem, required this.refreshData, required this.taskStatus, required this.taskStatusColor}) : super(key: key);
+  const CardItemWidget(
+      {Key? key,
+      required this.taskItem,
+      required this.refreshData,
+      required this.taskStatus,
+      required this.taskStatusColor})
+      : super(key: key);
 
   @override
   State<CardItemWidget> createState() => _CardItemWidgetState();
 }
 
 class _CardItemWidgetState extends State<CardItemWidget> {
-
-  late bool _deleteTaskInProgress = false;
-  late bool _updateTaskStatusInProgress = false;
+  final TaskDeleteController _deleteController =
+      Get.put(TaskDeleteController());
+  final TaskStatusUpdateController _updateController =
+      Get.put(TaskStatusUpdateController());
+  final BottomNavigationController _controller = Get.put(BottomNavigationController());
 
   @override
   Widget build(BuildContext context) {
-
-    var languageProvider = Provider.of<LanguageProvider>(context);
-    var currentLanguage = languageProvider.currentLanguage;
+    var languageController = Get.find<LanguageController>();
+    var currentLanguage = languageController.currentLanguage;
 
     return Card(
       child: Container(
@@ -71,7 +76,7 @@ class _CardItemWidgetState extends State<CardItemWidget> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                    padding: const EdgeInsets.symmetric(vertical: 8.0),
                     child: Text(
                       '${currentLanguage.date}: ${widget.taskItem.createdDate}',
                       style: TextStyle(
@@ -107,36 +112,75 @@ class _CardItemWidgetState extends State<CardItemWidget> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-
-                  Visibility(
-                    visible: _updateTaskStatusInProgress == false,
-                    replacement: const CircularProgressIndicator(color: Colors.green),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.edit_note,
-                        color: Colors.green.shade900,
-                        size: 20,
-                      ),
-                      onPressed: (){
-                        _showUpdateStatusDialog(widget.taskItem.sId!);
-                      },
-                    ),
+                  GetBuilder<TaskStatusUpdateController>(
+                    builder: (controller) {
+                      return Visibility(
+                        visible: !controller.inProgress,
+                        // Only show if not in progress
+                        replacement: controller.selectedItemId ==
+                                widget.taskItem.sId
+                            ? const CircularProgressIndicator(
+                                color: Colors
+                                    .green)
+                            : IconButton(
+                          icon: Icon(
+                            Icons.edit_note,
+                            color: Colors.green.shade900,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            controller.setSelectedItemId(widget.taskItem.sId!);
+                            _showUpdateStatusDialog(widget.taskItem.sId!, _controller.selectedIndex.value);
+                          },
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            Icons.edit_note,
+                            color: Colors.green.shade900,
+                            size: 20,
+                          ),
+                          onPressed: () {
+                            controller.setSelectedItemId(widget.taskItem.sId!);
+                            _showUpdateStatusDialog(widget.taskItem.sId!, _controller.selectedIndex.value);
+                          },
+                        ),
+                      );
+                    },
                   ),
-
-                  Visibility(
-                    visible: _deleteTaskInProgress == false,
-                    replacement: const CircularProgressIndicator(color: Colors.green),
-                    child: IconButton(
-                      icon: Icon(
-                        Icons.delete,
-                        color: Colors.red.shade900,
-                        size: 20,
+                  GetBuilder<TaskDeleteController>(builder: (deleteController) {
+                    return Visibility(
+                      visible: !deleteController.inProgress,
+                      replacement: deleteController.selectedItemId ==
+                              widget.taskItem.sId
+                          ? const CircularProgressIndicator(color: Colors.green)
+                          : IconButton(
+                              icon: Icon(
+                                Icons.delete,
+                                color: Colors.red.shade900,
+                                size: 20,
+                              ),
+                              onPressed: () {
+                                deleteController
+                                    .setSelectedItemId(widget.taskItem.sId!);
+                                deleteController.deleteTaskById(
+                                    widget.taskItem.sId!, widget.refreshData);
+                              },
+                            ),
+                      child: IconButton(
+                        icon: Icon(
+                          Icons.delete,
+                          color: Colors.red.shade900,
+                          size: 20,
+                        ),
+                        onPressed: () {
+                          deleteController
+                              .setSelectedItemId(widget.taskItem.sId!);
+                          deleteController.deleteTaskById(
+                              widget.taskItem.sId!, widget.refreshData);
+                        },
                       ),
-                      onPressed: (){
-                        _deleteTaskById(widget.taskItem.sId!);
-                      },
-                    ),
-                  ),
+                    );
+                  })
                 ],
               ),
             ),
@@ -146,48 +190,12 @@ class _CardItemWidgetState extends State<CardItemWidget> {
     );
   }
 
-  Future<void> _deleteTaskById(String id) async {
-    _deleteTaskInProgress = true;
-    setState(() {});
+  void _showUpdateStatusDialog(sId, int bottomNavIndex) {
+    bool isNewSelected = bottomNavIndex == 0;
+    bool isCompletedSelected = bottomNavIndex == 1;
+    bool isCancelledSelected = bottomNavIndex == 2;
+    bool isProgressSelected = bottomNavIndex == 3;
 
-    final response = await NetworkCaller.getRequest(Urls.deleteTask(id));
-    _deleteTaskInProgress = false;
-
-    if (response.isSuccess) {
-      widget.refreshData();
-    } else {
-      setState(() {});
-      if (mounted) {
-        showSnackBarMessage(
-          context,
-          response.errorMessage ?? 'Delete task list has been failed',
-        );
-      }
-    }
-  }
-
-  Future<void> _updateTaskById(String id, String status) async {
-    _updateTaskStatusInProgress = true;
-    setState(() {});
-
-    final response =
-    await NetworkCaller.getRequest(Urls.updateTaskStatus(id, status));
-    _updateTaskStatusInProgress = false;
-
-    if (response.isSuccess) {
-      widget.refreshData();
-    } else {
-      setState(() {});
-      if (mounted) {
-        showSnackBarMessage(
-          context,
-          response.errorMessage ?? 'Update task has been failed',
-        );
-      }
-    }
-  }
-
-  void _showUpdateStatusDialog(sId) {
     showDialog(
       context: context,
       builder: (context) {
@@ -196,34 +204,61 @@ class _CardItemWidgetState extends State<CardItemWidget> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const ListTile(
-                title: Text('New', style: TextStyle(color: Colors.black87)),
-                trailing: Icon(
+              ListTile(
+                title: const Text('New', style: TextStyle(color: Colors.black87)),
+                trailing: isNewSelected
+                    ? const Icon(
                   Icons.check,
                   color: Colors.black87,
-                ),
+                )
+                    : null,
+                onTap: () {
+                  isNewSelected ? null: _updateController.updateTaskById(sId, 'New', widget.refreshData);
+                  Navigator.pop(context);
+                },
               ),
               ListTile(
                 title: const Text('Completed',
                     style: TextStyle(color: Colors.black87)),
+                trailing: isCompletedSelected
+                    ? const Icon(
+                  Icons.check,
+                  color: Colors.black87,
+                )
+                    : null,
                 onTap: () {
-                  _updateTaskById(sId, 'Completed');
+                  isCompletedSelected ? null : _updateController.updateTaskById(
+                      sId, 'Completed', widget.refreshData);
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: const Text('Cancelled',
                     style: TextStyle(color: Colors.black87)),
+                trailing: isCancelledSelected
+                    ? const Icon(
+                  Icons.check,
+                  color: Colors.black87,
+                )
+                    : null,
                 onTap: () {
-                  _updateTaskById(sId, 'Cancelled');
+                  isCancelledSelected ? null : _updateController.updateTaskById(
+                      sId, 'Cancelled', widget.refreshData);
                   Navigator.pop(context);
                 },
               ),
               ListTile(
                 title: const Text('Progress',
                     style: TextStyle(color: Colors.black87)),
+                trailing: isProgressSelected
+                    ? const Icon(
+                  Icons.check,
+                  color: Colors.black87,
+                )
+                    : null,
                 onTap: () {
-                  _updateTaskById(sId, 'Progress');
+                  isProgressSelected ? null : _updateController.updateTaskById(
+                      sId, 'Progress', widget.refreshData);
                   Navigator.pop(context);
                 },
               ),
@@ -233,4 +268,5 @@ class _CardItemWidgetState extends State<CardItemWidget> {
       },
     );
   }
+
 }

@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:untitled/data/services/network_caller.dart';
-import 'package:untitled/data/utility/app_url.dart';
+import 'package:get/get.dart';
+import 'package:untitled/data/controller/task_manage/complete_controller.dart';
 import 'package:untitled/presentation/utiles/card_item_widget.dart';
-import 'package:untitled/presentation/utiles/custom_snackbar.dart';
-import '../../data/model/task_list_wrapper.dart';
-import '../../data/provider/language_provider.dart';
+import '../../data/controller/language_controller.dart';
 import '../utiles/custom_appbar.dart';
 import 'authenication/profile_screen.dart';
 
@@ -17,19 +14,18 @@ class CompleteScreen extends StatefulWidget {
 }
 
 class _CompleteScreenState extends State<CompleteScreen> {
-  late bool _getCompletedTaskListInProgress = false;
-  late TaskListWrapper _completeTaskListWrapper = TaskListWrapper();
+  final CompleteController _controller = Get.put(CompleteController());
 
   @override
   void initState() {
     super.initState();
-    _getAllCompleteTaskList();
+    _controller.getAllCompleteTaskList();
   }
 
   @override
   Widget build(BuildContext context) {
-    var languageProvider = Provider.of<LanguageProvider>(context);
-    var currentLanguage = languageProvider.currentLanguage;
+    var languageController = Get.find<LanguageController>();
+    var currentLanguage = languageController.currentLanguage;
 
     return Scaffold(
       backgroundColor: Theme.of(context).colorScheme.background,
@@ -40,14 +36,14 @@ class _CompleteScreenState extends State<CompleteScreen> {
         },
       ),
       body: RefreshIndicator(
-        onRefresh: _refreshData,
+        onRefresh: _controller.refreshData,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 8.0),
           child: SingleChildScrollView(
             child: Column(
               children: [
                 const SizedBox(height: 8),
-                _buildItemUpdate(),
+                _buildItemUpdate(currentLanguage),
               ],
             ),
           ),
@@ -56,53 +52,32 @@ class _CompleteScreenState extends State<CompleteScreen> {
     );
   }
 
-  Widget _buildItemUpdate() {
-    return Visibility(
-      visible: _completeTaskListWrapper.taskList?.isNotEmpty ?? false,
-      replacement: Center(child: Text('No item')),
-
-      child: ListView.builder(
-        padding: EdgeInsets.zero,
-        itemCount: _completeTaskListWrapper.taskList?.length ?? 0,
-        shrinkWrap: true,
-        primary: false,
-
-        itemBuilder: (BuildContext context, index) {
-          var languageProvider = Provider.of<LanguageProvider>(context);
-          var currentLanguage = languageProvider.currentLanguage;
-
-          return CardItemWidget(
-            taskItem: _completeTaskListWrapper.taskList![index],
-            refreshData: () {
-              _refreshData();
-            }, taskStatus: currentLanguage.complete, taskStatusColor: Colors.purple.shade800,
-          );
-        },
-      ),
+  Widget _buildItemUpdate(currentLanguage) {
+    return GetBuilder<CompleteController>(
+      builder: (controller) {
+        return Visibility(
+          visible:
+              controller.completeTaskListWrapper.taskList?.isNotEmpty ?? false,
+          replacement: const Center(child: Text('No item')),
+          child: ListView.builder(
+            padding: EdgeInsets.zero,
+            itemCount:
+                controller.completeTaskListWrapper.taskList?.length ?? 0,
+            shrinkWrap: true,
+            primary: false,
+            itemBuilder: (BuildContext context, index) {
+              return CardItemWidget(
+                taskItem: controller.completeTaskListWrapper.taskList![index],
+                refreshData: () {
+                  controller.refreshData();
+                },
+                taskStatus: currentLanguage.complete,
+                taskStatusColor: Colors.purple.shade800,
+              );
+            },
+          ),
+        );
+      },
     );
-  }
-
-  Future<void> _refreshData() async {
-    await _getAllCompleteTaskList();
-  }
-
-  Future<void> _getAllCompleteTaskList() async {
-    _getCompletedTaskListInProgress = true;
-    setState(() {});
-    final response = await NetworkCaller.getRequest(Urls.completedTaskList);
-
-    if (response.isSuccess) {
-      _completeTaskListWrapper = TaskListWrapper.fromJson(response.responseBody);
-      _getCompletedTaskListInProgress = false;
-      setState(() {});
-    } else {
-      _getCompletedTaskListInProgress = false;
-      setState(() {});
-      showSnackBarMessage(
-        context,
-        response.errorMessage ?? 'Get complete task list has been failed',
-      );
-    }
-    setState(() => _getCompletedTaskListInProgress = false);
   }
 }

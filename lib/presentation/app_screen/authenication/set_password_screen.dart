@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../../utiles/background_screen.dart';
 import '../../utiles/submit_button_widget.dart';
-import '../bottom_navigation_screen.dart';
 import 'log_in_screen.dart';
 
 class SetPasswordScreen extends StatefulWidget {
